@@ -2,50 +2,76 @@ const mongoose = require('mongoose');
 const userModels = require('./models/user-models');
 
 function connectDB() {
-    mongoose.connect('mongodb://localhost/botDB', {useNewUrlParser: true, useUnifiedTopology: true});
-    const db = mongoose.connection;
-    let error = false;
+	mongoose.connect('mongodb://localhost/botDB', {useNewUrlParser: true, useUnifiedTopology: true});
+	const db = mongoose.connection;
+	let error = false;
 
-    db.on('error', function() {
-        console.error.bind(console, 'connection error:');
-        error = true;
-    });
+	db.on('error', function() {
+		console.error.bind(console, 'connection error:');
+		error = true;
+	});
 
-    db.once('open', function() {
-        console.log('connected...');
-        error = false;
-    });
+	db.once('open', function() {
+		console.log('connected...');
+		error = false;
+	});
 
-    return error;
+	return error;
+}
+
+async function fetchRegsiteredUsers() {
+	const connectionError = connectDB();
+	const db = mongoose.connection;
+	let registeredUsers = [];
+
+	if (connectionError) {
+		return;
+	}
+
+	let users = await userModels.discordUsersModel.find({}).exec();
+
+	if (users) {
+		users.forEach((user) => {
+			if (user.id) {
+				registeredUsers.push(user.id);
+			}
+		});
+	}
+
+	mongoose.disconnect();
+	db.close();
+
+	return registeredUsers;
 }
 
 async function createUser(user) {
-    const connectionError = connectDB();
-    const db = mongoose.connection;
+	const connectionError = connectDB();
+	const db = mongoose.connection;
 
-    if (connectionError) {
-        return;
-    }
+	if (connectionError) {
+		return;
+	}
 
-    const creationSuccess = await userModels.discordUsersModel.create({
-        id: user.id,
-        name: user.name,
-        tag: user.tag
-    }, (err, instanceStatus) => {
-        if (err) {
-            console.log('Error happened:' + err);
-            return false;
-        } else {
-            console.log('saved');
-            mongoose.disconnect();
-            db.close();
-            return true;
-        }
-    });
+	const creationSuccess = await userModels.discordUsersModel.create({
+		id: user.id,
+		name: user.name,
+		tag: user.tag
+	}, (err, instanceStatus) => {
+		if (err) {
+			console.log('Error happened:' + err);
+			return false;
+		} else {
+			console.log('saved');
+			mongoose.disconnect();
+			db.close();
+			return true;
+		}
+	});
 
-    return creationSuccess;
+	return creationSuccess;
 }
 
 module.exports = {
-    createUser: createUser
+	createUser: createUser,
+	fetchRegsiteredUsers: fetchRegsiteredUsers
 }
