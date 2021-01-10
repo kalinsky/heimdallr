@@ -1,14 +1,13 @@
-const dbConnection = require('./db/connect');
 const Discord = require('discord.js');
 const client = new Discord.Client();
 const User = require('./models/User');
-const userUtils = require('./utils/user-utils');
+const userUtils = require('./utils/userUtils');
 let registeredUsers = [];
 
 function init() {
 	client.on('ready', async () => {
 	  console.log(`Logged in as ${client.user.tag}!`);
-	  registeredUsers = await dbConnection.fetchRegsiteredUsers();
+	  registeredUsers = await userUtils.getRegisteredUsers();
 	});
 
 	client.on('message', msg => {
@@ -24,7 +23,7 @@ function init() {
 
 			if (!userRegistered) {
 				const discordUser = new User(msg.author);
-				const registerStatus = dbConnection.createUser(discordUser);
+				const registerStatus = userUtils.createUser(discordUser);
 
 				if (registerStatus) {
 					console.log('register success');

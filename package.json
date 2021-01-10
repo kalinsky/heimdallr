@@ -19,6 +19,6 @@
   "homepage": "https://github.com/kalinsky/heimdallr#readme",
   "dependencies": {
     "discord.js": "^12.5.1",
-    "mongoose": "^5.11.10"
+    "node-fetch": "^2.6.1"
   }
 }
