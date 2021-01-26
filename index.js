@@ -84,4 +84,4 @@ function init() {
 init();
 
 
-client.login('bot token here');
+client.login(process.env.BOT_TOKEN);
