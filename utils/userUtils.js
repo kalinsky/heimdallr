@@ -8,10 +8,16 @@ function isUserRegistered(userID, registeredUsers) {
 }
 
 async function getRegisteredUsers() {
-    const response = await fetch('http://localhost:3000/getUsers');
-    const responseJSON = await response.json();
+    try {
+        const response = await fetch('http://localhost:3000/getUsers');
+        const responseJSON = await response.json();
 
-    return responseJSON.users;
+        return responseJSON;
+    } catch (error) {
+        console.log('There were problems fetching the users');
+
+        return '';
+    }
 }
 
 async function createUser(user) {
@@ -24,6 +30,19 @@ async function createUser(user) {
     const responseJSON = await response.json();
 
     console.log('response in bot'+ responseJSON.error);
+}
+
+async function getUser(userID) {
+    try {
+        const response = await fetch('http://localhost:3000/getUsers');
+        const responseJSON = await response.json();
+
+        return responseJSON;
+    } catch (error) {
+        console.log('There were problems fetching the users');
+
+        return '';
+    }
 }
 
 module.exports = {

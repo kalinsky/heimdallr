@@ -8,7 +8,9 @@ let registeredUsers = [];
 function init() {
 	client.on('ready', async () => {
 	  console.log(`Logged in as ${client.user.tag}!`);
-	  registeredUsers = await userUtils.getRegisteredUsers();
+	  let registeredUsersResponse = await userUtils.getRegisteredUsers();
+
+	  registeredUsers = registeredUsersResponse.users;
 	});
 
 	client.on('guildMemberAdd', (member) => {
@@ -56,7 +58,7 @@ function init() {
 					msg.reply('An error ocurred! Please try again :tired_face:');
 				}
 			} else {
-				msg.reply('Yooooooo, you are already registered! Just type /me to see your profile.');
+				msg.reply('Yooooooo, you are already registered! Just type /myjourney to see your profile.');
 			}
 		}
 
@@ -69,7 +71,7 @@ function init() {
 			ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
 			ctx.strokeRect(0, 0, canvas.width, canvas.height);
 			const avatar = await Canvas.loadImage(msg.author.displayAvatarURL({ format: 'jpg' }));
-			ctx.drawImage(avatar, 25, 0, 200, canvas.height);
+			ctx.drawImage(avatar, 25, 25, 200, 200);
 			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'progress.png');
 
 			msg.reply('Test image: ', attachment);
