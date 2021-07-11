@@ -1,9 +1,14 @@
+import {
+	DiscordMember,
+	DiscordMessage
+} from './interfaces/discord.interfaces';
 const Discord = require('discord.js');
 const Canvas = require('canvas');
 const client = new Discord.Client();
 const User = require('./models/User');
 const userUtils = require('./utils/userUtils');
-let registeredUsers = [];
+
+let registeredUsers: Array<string> = [];
 
 function init() {
 	client.on('ready', async () => {
@@ -13,13 +18,13 @@ function init() {
 	  registeredUsers = registeredUsersResponse.users;
 	});
 
-	client.on('guildMemberAdd', (member) => {
+	client.on('guildMemberAdd', (member: DiscordMember) => {
 		console.log('New member has joined');
 		const guild = member.guild;
 		const cachedChannels = guild.channels.cache;
 		const cachedRoles = guild.roles.cache;
-		const welcomeRole = cachedRoles.find(role => role.name === 'Scrub');
-		const welcomeChannel = cachedChannels.find(channel => channel.name === 'welcome');
+		const welcomeRole = cachedRoles.find((role: any): boolean => role.name === 'Scrub');
+		const welcomeChannel = cachedChannels.find((channel: any): boolean => channel.name === 'welcome');
 
 		if (welcomeChannel && welcomeChannel.type === 'text') {
 			welcomeChannel.send(`Yoooo <@${member.id}>! Welcome and have fun in our friendly and mostly annoying discord server.`);
@@ -30,7 +35,7 @@ function init() {
 		}
 	});
 
-	client.on('message', async msg => {
+	client.on('message', async (msg: DiscordMessage) => {
 		if (msg.content === 'ping') {
 			msg.reply('Pong!');
 			msg.reply('My author is: ' + msg.author.tag);
