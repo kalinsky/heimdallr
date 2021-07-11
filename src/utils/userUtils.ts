@@ -1,9 +1,7 @@
 const fetch = require('node-fetch');
+import { User } from '../models/User';
 
-function isUserRegistered(userID, registeredUsers) {
-    // console.log(userID);
-    // console.log(registeredUsers);
-
+function isUserRegistered(userID: string, registeredUsers: Array<string>) {
     return registeredUsers.includes(userID);
 }
 
@@ -20,7 +18,7 @@ async function getRegisteredUsers() {
     }
 }
 
-async function createUser(user) {
+async function createUser(user: User) {
     console.log('should make a request');
     const response = await fetch('http://localhost:3000/createUser', {
         method: 'post',
@@ -32,7 +30,7 @@ async function createUser(user) {
     console.log('response in bot'+ responseJSON.error);
 }
 
-async function getUser(userID) {
+async function getUser(userID: string) {
     try {
         const response = await fetch('http://localhost:3000/getUsers');
         const responseJSON = await response.json();

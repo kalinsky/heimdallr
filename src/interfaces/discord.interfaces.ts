@@ -24,6 +24,7 @@ export interface DiscordMember {
 export interface DiscordUser {
 	tag: string,
 	id: string,
+	username: string,
 	displayAvatarURL(params: object): void,
 	send(content: string, options?: object): void
 }
