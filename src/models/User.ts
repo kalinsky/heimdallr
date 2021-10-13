@@ -2,7 +2,7 @@ import {
 	DiscordUser
 } from '../interfaces/discord.interfaces';
 
-export class User {
+export default class User {
     id: string;
     tag: string;
     name: string;

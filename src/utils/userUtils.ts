@@ -1,5 +1,5 @@
 const fetch = require('node-fetch');
-import { User } from '../models/User';
+import User from '../models/User';
 
 function isUserRegistered(userID: string, registeredUsers: Array<string>) {
     return registeredUsers.includes(userID);
@@ -7,7 +7,11 @@ function isUserRegistered(userID: string, registeredUsers: Array<string>) {
 
 async function getRegisteredUsers() {
     try {
-        const response = await fetch('http://localhost:3000/getUsers');
+        const response = await fetch('http://localhost:3000/getUsers', {
+            headers: {
+                'shh-a-secret': 'CIr73CDhtMHRIgds6mRHCDAlFvGS6bhf'
+            }
+        });
         const responseJSON = await response.json();
 
         return responseJSON;
@@ -23,7 +27,10 @@ async function createUser(user: User) {
     const response = await fetch('http://localhost:3000/createUser', {
         method: 'post',
         body: JSON.stringify(user),
-        headers: { 'Content-Type': 'application/json' }
+        headers: {
+            'Content-Type': 'application/json',
+            'shh-a-secret': 'CIr73CDhtMHRIgds6mRHCDAlFvGS6bhf'
+         }
     });
     const responseJSON = await response.json();
 

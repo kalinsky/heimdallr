@@ -5,7 +5,7 @@ import {
 const Discord = require('discord.js');
 const Canvas = require('canvas');
 const client = new Discord.Client();
-const User = require('./models/User');
+import User from './models/User';
 const userUtils = require('./utils/userUtils');
 
 let registeredUsers: Array<string> = [];
