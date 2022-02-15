@@ -2,20 +2,13 @@ import {
 	DiscordMember,
 	DiscordMessage
 } from './interfaces/discord.interfaces';
-const Discord = require('discord.js');
-const Canvas = require('canvas');
-const client = new Discord.Client();
-import User from './models/User';
-const userUtils = require('./utils/userUtils');
-
-let registeredUsers: Array<string> = [];
+const { Client, Intents } = require('discord.js');
+const client = new Client({ intents: [Intents.FLAGS.GUILD_MESSAGES, Intents.FLAGS.GUILDS, Intents.FLAGS.GUILD_INTEGRATIONS] });
+import { isUserRegistered, getRegisteredUsers, createUser } from './utils/userUtils';
 
 function init() {
-	client.on('ready', async () => {
+	client.once('ready', async () => {
 	  console.log(`Logged in as ${client.user.tag}!`);
-	  let registeredUsersResponse = await userUtils.getRegisteredUsers();
-
-	  registeredUsers = registeredUsersResponse.users;
 	});
 
 	client.on('guildMemberAdd', (member: DiscordMember) => {
@@ -27,63 +20,38 @@ function init() {
 		const welcomeChannel = cachedChannels.find((channel: any): boolean => channel.name === 'welcome');
 
 		if (welcomeChannel && welcomeChannel.type === 'text') {
-			welcomeChannel.send(`Yoooo <@${member.id}>! Welcome and have fun in our friendly and mostly annoying discord server.`);
+			welcomeChannel.send(`Yoooo <@${member.id}>! Thanks for joining us :)`);
 		}
 
 		if (welcomeRole) {
 			member.roles.add(welcomeRole);
 		}
+
+		if (!createUser(member)) {
+			welcomeChannel.send(`Hey <@${member.id}, please !register yourself.`);
+		}
 	});
 
-	client.on('message', async (msg: DiscordMessage) => {
-		if (msg.content === 'ping') {
-			msg.reply('Pong!');
-			msg.reply('My author is: ' + msg.author.tag);
+	client.on('messageCreate', async (message: DiscordMessage) => {
+		if (message.content === '!ping') {
+			message.channel.send('PONG');
 		}
 
-		if (msg.content === '/registerme') {
-			const userRegistered = userUtils.isUserRegistered(msg.author.id, registeredUsers);
+		if (message.content === '!registerme') {
+			const isExistingUser = await isUserRegistered(message.member);
 
-			console.log('is registered: ' + userRegistered);
-
-			if (!userRegistered) {
-				const discordUser = new User(msg.author);
-				const registerStatus = userUtils.createUser(discordUser);
-
-				if (registerStatus) {
-					console.log('register success');
-					msg.reply('Thank you for registering! Your registration to our DB is successful');
-
-					// prevent overflooding the array
-					if (!registeredUsers.includes(msg.author.id)) {
-						registeredUsers.push(msg.author.id);
-					}
-				} else {
-					console.log('register fail');
-					msg.reply('An error ocurred! Please try again :tired_face:');
-				}
+			if (isExistingUser) {
+				message.channel.send('You are already registered bruv. Go on and have fun on this server!');
 			} else {
-				msg.reply('Yooooooo, you are already registered! Just type /myjourney to see your profile.');
+				const creationResult = await createUser(message.member);
+
+				if (!creationResult) {
+					console.log('should send msg');
+					message.channel.send('Please try again');
+				} else {
+					message.channel.send(`Thanks for registering <@${message.member.id}>`);
+				}
 			}
-		}
-
-		// Search for the user and return his info
-		if (msg.content === '/myjourney') {
-			const canvas = Canvas.createCanvas(700, 250);
-			const ctx = canvas.getContext('2d');
-			const background = await Canvas.loadImage('./img/background.png');
-
-			ctx.drawImage(background, 0, 0, canvas.width, canvas.height);
-			ctx.strokeRect(0, 0, canvas.width, canvas.height);
-			const avatar = await Canvas.loadImage(msg.author.displayAvatarURL({ format: 'jpg' }));
-			ctx.drawImage(avatar, 25, 25, 200, 200);
-			const attachment = new Discord.MessageAttachment(canvas.toBuffer(), 'progress.png');
-
-			msg.reply('Test image: ', attachment);
-		}
-
-		if (msg.content === '/repo') {
-			msg.author.send('You can find my repository at: https://github.com/kalinsky/heimdallr');
 		}
 	});
 }

@@ -20,7 +20,7 @@
   "homepage": "https://github.com/kalinsky/heimdallr#readme",
   "dependencies": {
     "canvas": "^2.6.1",
-    "discord.js": "^12.5.1",
+    "discord.js": "^13.6.0",
     "node-fetch": "^2.6.1"
   },
   "devDependencies": {
